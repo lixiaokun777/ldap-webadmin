@@ -12,22 +12,34 @@ body {
 
 /* Login page container with improved styling */
 .container {
-    width: 400px;
-    margin: 10% auto;
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
     background: rgba(0, 0, 0, 0.8);
-    padding: 30px;
+    padding: 40px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-    text-align: center;
     color: #ffffff;
+    position: relative;
+    top: 20px; /* Moved down by 20px */
 }
 
-/* Header with bold and clear design */
+/* Header positioned in the red zone and centered */
 h1 {
-    font-size: 26px;
-    margin-bottom: 20px;
+    font-size: 30px;
+    margin: 0;
     color: #00e1ff;
     text-shadow: 0px 0px 15px #00e1ff;
+    text-align: center;
+    background: rgba(255, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 20px);
+    box-sizing: border-box;
 }
 
 /* Stylish input fields */
@@ -76,11 +88,22 @@ button:hover {
 /* Admin dashboard adjustments */
 .dashboard {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 100vh;
     background: var(--background-image-dashboard) no-repeat center center fixed;
     background-size: cover;
     color: #2c3e50;
+}
+
+/* Dashboard header styling */
+.dashboard-header {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 15px 0;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
 }
 
 .sidebar {
@@ -108,13 +131,14 @@ button:hover {
 
 .main {
     flex: 1;
-    background: rgba(255, 255, 255, 0.9);
+    background: #f9f9f9;
     padding: 25px;
     overflow-y: auto;
-    border-top-left-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    width: 100%;
 }
 
 .main h2 {
@@ -127,7 +151,6 @@ button:hover {
 /* Table styling */
 table {
     width: 90%;
-    max-width: 1200px;
     margin: 20px auto;
     border-collapse: collapse;
     font-size: 16px;

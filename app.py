@@ -7,10 +7,10 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # 用于会话管理的密钥
 
 # 配置LDAP默认值
-app.config['LDAP_SERVER'] = 'ldap://172.16.1.225:389'
-app.config['LDAP_USER_DN'] = 'cn=admin,dc=unionstrong,dc=com'
-app.config['LDAP_PASSWORD'] = '123456'
-app.config['BASE_DN'] = 'ou=people,dc=unionstrong,dc=com'
+app.config['LDAP_SERVER'] = ''
+app.config['LDAP_USER_DN'] = ''
+app.config['LDAP_PASSWORD'] = ''
+app.config['BASE_DN'] = ''
 app.config['USERS_PER_PAGE'] = 50
 
 def get_ldap_connection():
