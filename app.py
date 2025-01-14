@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, render_template, redirect, url_for, flash
-from ldap3 import Server, Connection, ALL, MODIFY_REPLACE
+from ldap3 import Server, Connection, ALL, MODIFY_REPLACE, MODIFY_ADD  # 添加这个导入
 import os
 
 app = Flask(__name__)
@@ -34,6 +34,7 @@ def index(page=1):
     start = (page - 1) * app.config['USERS_PER_PAGE']
     end = start + app.config['USERS_PER_PAGE']
     
+    # Retrieve user entries
     conn.search(app.config['BASE_DN'], '(objectClass=inetOrgPerson)', attributes=['cn', 'sn', 'mail'])
     entries = conn.entries[start:end]
     total_entries = len(conn.entries)
@@ -41,6 +42,20 @@ def index(page=1):
     total_pages = (total_entries + app.config['USERS_PER_PAGE'] - 1) // app.config['USERS_PER_PAGE']
     
     return render_template('index.html', entries=entries, page=page, total_pages=total_pages)
+
+@app.route('/groups')
+def groups():
+    if not app.config['LDAP_SERVER']:
+        return redirect(url_for('config'))
+    conn = get_ldap_connection()
+    if not conn.bound:
+        return redirect(url_for('config'))
+    
+    # Retrieve group entries
+    conn.search(app.config['BASE_DN'], '(objectClass=groupOfNames)', attributes=['cn', 'member'])
+    groups = conn.entries
+    
+    return render_template('groups.html', groups=groups)
 
 @app.route('/config', methods=['GET', 'POST'])
 def config():
@@ -82,7 +97,7 @@ def add_group():
         conn = get_ldap_connection()
         if conn.bound:
             try:
-                conn.add(group_dn, ['groupOfNames'], {'cn': cn, 'member': []})
+                conn.add(group_dn, ['groupOfNames'], {'cn': cn, 'member': ['']})
                 if not conn.result['description'] == 'success':
                     flash(f"添加组错误: {conn.result['description']}", 'error')
                 else:
@@ -124,6 +139,55 @@ def delete(cn):
         except Exception as e:
             flash(f"删除用户异常: {str(e)}", 'error')
     return redirect(url_for('index'))
+
+@app.route('/delete_group/<cn>', methods=['POST'])
+def delete_group(cn):
+    group_dn = 'cn={},{}'.format(cn, app.config['BASE_DN'])
+    conn = get_ldap_connection()
+    if conn.bound:
+        try:
+            conn.delete(group_dn)
+            if not conn.result['description'] == 'success':
+                flash(f"删除组错误: {conn.result['description']}", 'error')
+            else:
+                flash('组删除成功！', 'success')
+        except Exception as e:
+            flash(f"删除组异常: {str(e)}", 'error')
+    return redirect(url_for('groups'))
+
+@app.route('/search')
+def search():
+    query = request.args.get('query')
+    if not query:
+        flash('请输入搜索关键词', 'error')
+        return redirect(url_for('index'))
+    
+    conn = get_ldap_connection()
+    if not conn.bound:
+        return redirect(url_for('config'))
+    
+    search_filter = f'(&(objectClass=inetOrgPerson)(|(cn=*{query}*)(sn=*{query}*)(mail=*{query}*)))'
+    conn.search(app.config['BASE_DN'], search_filter, attributes=['cn', 'sn', 'mail'])
+    entries = conn.entries
+    
+    return render_template('index.html', entries=entries, page=1, total_pages=1)
+
+@app.route('/add_user_to_group/<cn>', methods=['POST'])
+def add_user_to_group(cn):
+    user_dn = request.form['user_dn']
+    group_dn = 'cn={},{}'.format(cn, app.config['BASE_DN'])
+    conn = get_ldap_connection()
+    if conn.bound:
+        try:
+            # 使用 MODIFY_ADD 添加用户到组
+            conn.modify(group_dn, {'member': [(MODIFY_ADD, [user_dn])]})
+            if not conn.result['description'] == 'success':
+                flash(f"添加用户到组错误: {conn.result['description']}", 'error')
+            else:
+                flash('用户成功添加到组！', 'success')
+        except Exception as e:
+            flash(f"添加用户到组异常: {str(e)}", 'error')
+    return redirect(url_for('groups'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

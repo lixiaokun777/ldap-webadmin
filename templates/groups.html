@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组管理</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>组管理</h1>
+    <a href="{{ url_for('index') }}">返回主页</a>
+    <a href="{{ url_for('add_group') }}">添加组</a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <table>
+        <tr>
+            <th>CN</th>
+            <th>成员</th>
+            <th>操作</th>
+        </tr>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.cn }}</td>
+            <td>
+                {% for member in group.member %}
+                    <p>{{ member }}</p>
+                {% endfor %}
+            </td>
+            <td>
+                <form action="{{ url_for('delete_group', cn=group.cn) }}" method="post" style="display:inline;">
+                    <button type="submit">删除</button>
+                </form>
+                <form action="{{ url_for('add_user_to_group', cn=group.cn) }}" method="post" style="display:inline;">
+                    <input type="text" name="user_dn" placeholder="用户 DN (如: cn=用户,dc=example,dc=com)" required>
+                    <button type="submit">添加用户</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

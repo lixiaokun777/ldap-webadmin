@@ -12,6 +12,7 @@
     <a href="{{ url_for('config') }}">配置 LDAP</a>
     <a href="{{ url_for('add_user') }}">添加用户</a>
     <a href="{{ url_for('add_group') }}">添加组</a>
+    <a href="{{ url_for('groups') }}">管理组</a>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="flash-message">
@@ -21,6 +22,11 @@
             </div>
         {% endif %}
     {% endwith %}
+    <form action="{{ url_for('search') }}" method="get" style="margin-bottom: 20px;">
+        <input type="text" name="query" placeholder="搜索用户" required>
+        <button type="submit">搜索</button>
+    </form>
+    <h2>用户列表</h2>
     <table>
         <tr>
             <th>CN</th>
@@ -38,6 +44,29 @@
                     <button type="submit">删除</button>
                 </form>
                 <a href="{{ url_for('change_password', cn=entry.cn) }}">修改密码</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>组列表</h2>
+    <table>
+        <tr>
+            <th>CN</th>
+            <th>成员</th>
+            <th>操作</th>
+        </tr>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.cn }}</td>
+            <td>
+                {% for member in group.member %}
+                    <p>{{ member }}</p>
+                {% endfor %}
+            </td>
+            <td>
+                <form action="{{ url_for('delete_group', cn=group.cn) }}" method="post" style="display:inline;">
+                    <button type="submit">删除</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
