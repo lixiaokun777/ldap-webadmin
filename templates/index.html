@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLDAP 管理</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>OpenLDAP 管理</h1>
+    <a href="{{ url_for('config') }}">配置 LDAP</a>
+    <a href="{{ url_for('add_user') }}">添加用户</a>
+    <a href="{{ url_for('add_group') }}">添加组</a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <table>
+        <tr>
+            <th>CN</th>
+            <th>SN</th>
+            <th>邮箱</th>
+            <th>操作</th>
+        </tr>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ entry.cn }}</td>
+            <td>{{ entry.sn }}</td>
+            <td>{{ entry.mail }}</td>
+            <td>
+                <form action="{{ url_for('delete', cn=entry.cn) }}" method="post" style="display:inline;">
+                    <button type="submit">删除</button>
+                </form>
+                <a href="{{ url_for('change_password', cn=entry.cn) }}">修改密码</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('index', page=page-1) }}">&laquo; 上一页</a>
+        {% endif %}
+        <span>第 {{ page }} 页，共 {{ total_pages }} 页</span>
+        {% if page < total_pages %}
+            <a href="{{ url_for('index', page=page+1) }}">下一页 &raquo;</a>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

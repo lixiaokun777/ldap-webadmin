@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置 LDAP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>配置 LDAP</h1>
+    <form action="{{ url_for('config') }}" method="post">
+        <label for="ldap_server">LDAP 服务器:</label>
+        <input type="text" name="ldap_server" id="ldap_server" required>
+        <br>
+        <label for="ldap_user_dn">LDAP 用户 DN:</label>
+        <input type="text" name="ldap_user_dn" id="ldap_user_dn" required>
+        <br>
+        <label for="ldap_password">LDAP 密码:</label>
+        <input type="password" name="ldap_password" id="ldap_password" required>
+        <br>
+        <label for="base_dn">Base DN:</label>
+        <input type="text" name="base_dn" id="base_dn" required>
+        <br>
+        <button type="submit">保存配置</button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+</body>
+</html>

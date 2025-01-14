@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加用户</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>添加用户</h1>
+    <form action="{{ url_for('add_user') }}" method="post">
+        <label for="cn">CN:</label>
+        <input type="text" name="cn" id="cn" required>
+        <br>
+        <label for="sn">SN:</label>
+        <input type="text" name="sn" id="sn" required>
+        <br>
+        <label for="mail">邮箱:</label>
+        <input type="email" name="mail" id="mail" required>
+        <br>
+        <label for="password">密码:</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <button type="submit">添加用户</button>
+    </form>
+</div>
+</body>
+</html>
